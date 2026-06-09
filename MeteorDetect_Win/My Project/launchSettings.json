@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MeteorDetect_Win": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

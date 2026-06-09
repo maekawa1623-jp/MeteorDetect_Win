@@ -1,0 +1,11 @@
+## Visual Studioの不要ファイル除外
+.vs/
+[Bb]in/
+[Oo]bj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## ユーザー固有の設定ファイル（個人情報やパスが含まれるため絶対除外）
+*.config
