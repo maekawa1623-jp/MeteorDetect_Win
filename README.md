@@ -24,7 +24,7 @@ https://dl.zwoastro.com/software?app=DeveloperCameraSdk&platform=windows86&regio
 3. アプリを起動し、入力ソース（USB / ZWO / RTSP / Video）を選択して「開始」をクリックします。
 4. 必要に応じて、メイン画面からダイレクトに「マスク編集（検知除外エリア指定）」を設定可能です。
 
-謝辞 / Credits
+## 謝辞 / Credits
 本システムのコアとなる流星検出アルゴリズムおよび画像処理パイプラインの設計にあたっては、kin-hasegawa 氏の
 オープンソースプロジェクトである meteor-detect を深く参考にさせていただきました。
 素晴らしい先行知見と成果物の公開に、心より感謝と敬意を表します。
