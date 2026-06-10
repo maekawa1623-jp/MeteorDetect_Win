@@ -1,7 +1,8 @@
-# MeteorDetect_Win
+# MeteorDetect_Win（プロトタイプ）
 
 Windows Forms、OpenCVSharp、およびZWO ASIカメラSDKを組み合わせた、高性能な流星自動検知・常時録画システムです。
 個人的に作成したツールの為、無保証、無サポートです。
+将来的にWindows、MAC両対応のクロスプラとフォーム化を予定しております。
 
 ## 主な機能
 - **マルチソース対応**: USBカメラ、ZWO ASI冷却/非冷却カメラ、RTSPストリーム（ATOM Cam等）、動画ファイルに対応
