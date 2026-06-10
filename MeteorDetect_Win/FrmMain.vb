@@ -174,6 +174,9 @@ Public Class FrmMain
             ' ==========================================================
             TxtRtspUrl.Text = My.Settings.RtspUrl
 
+            ' ★ここに追加：起動時のデフォルトを「全画面(100%)」に固定する
+            CmbRoiSelect.SelectedIndex = 0
+
             ' ガンマ補正用LUTの初期化
             UpdateGammaLut()
 
@@ -319,6 +322,7 @@ Public Class FrmMain
             GrpSource.Enabled = False
             BtnRefreshUsb.Enabled = False
             BtnRefreshZwo.Enabled = False
+            CmbRoiSelect.Enabled = False ' ★ここに追加！解析中は変更できないようにロック
 
             _stopwatch.Restart()
             _frameCount = 0
@@ -409,6 +413,7 @@ Public Class FrmMain
         BtnRefreshZwo.Enabled = True
         GrpSource.Enabled = True
         BtnStop.Enabled = False
+        CmbRoiSelect.Enabled = True ' ★ここに追加！停止したのでROIの変更を許可する
 
         ' ==========================================================
         ' 【追加】ZWOカメラ特有のUIロック解除とフラグ操作
@@ -470,6 +475,37 @@ Public Class FrmMain
 
         Try
             ' ==========================================================
+            ' ★選択されたROI（範囲切り出し）の適用：ZWOカメラ使用時のみ
+            ' ==========================================================
+            ' 修正ポイント：RdoZwo.Checked を追加し、ZWO以外の時はスキップさせる
+            If RdoZwo.Checked AndAlso CmbRoiSelect.SelectedIndex > 0 Then
+                Dim w As Integer = frame.Width
+                Dim h As Integer = frame.Height
+                Dim roiRect As New Rect(0, 0, 0, 0)
+
+                Select Case CmbRoiSelect.SelectedIndex
+                    Case 1 ' 中央 95% (上下左右の余白は2.5%)
+                        roiRect = New Rect(CInt(w * 0.025), CInt(h * 0.025), CInt(w * 0.95), CInt(h * 0.95))
+                    Case 2 ' 中央 90% (上下左右の余白は5%)
+                        roiRect = New Rect(CInt(w * 0.05), CInt(h * 0.05), CInt(w * 0.9), CInt(h * 0.9))
+                    Case 3 ' 中央 85% (上下左右の余白は7.5%)
+                        roiRect = New Rect(CInt(w * 0.075), CInt(h * 0.075), CInt(w * 0.85), CInt(h * 0.85))
+                    Case 4 ' 中央 80% (上下左右の余白は10%)
+                        roiRect = New Rect(CInt(w * 0.1), CInt(h * 0.1), CInt(w * 0.8), CInt(h * 0.8))
+                End Select
+
+                If roiRect.Width > 0 AndAlso roiRect.Height > 0 Then
+                    ' 指定範囲を切り出してクローンを生成
+                    Dim cropped As Mat = New Mat(frame, roiRect).Clone()
+                    ' 元の生画像は用済みなのでここで即座に解放
+                    frame.Dispose()
+                    ' frame変数を切り出し後の画像にすり替える
+                    frame = cropped
+                End If
+            End If
+            ' ==========================================================
+
+            ' ==========================================================
             ' 1. 最初に、表示・録画・検知の「共通」となる明るい画像を作る
             ' ==========================================================
             displayMat = New Mat()
@@ -513,9 +549,9 @@ Public Class FrmMain
             End If
 
             ' ==========================================================
-            ' 3. 日時を描画する (化粧後の明るい displayMat の方に描く)
+            ' 3. 日時を描画する (★【修正】動画ファイル以外、かつスイッチがONの時のみ)
             ' ==========================================================
-            If Not RdoVideo.Checked Then
+            If Not RdoVideo.Checked AndAlso ChkShowTimestamp.Checked Then
                 Dim timeStr As String = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")
                 Dim scale As Double = 1.0 * (displayMat.Height / 1080.0)
                 Dim fontThick As Integer = If(displayMat.Height > 2000, 4, 2)
@@ -1617,13 +1653,22 @@ Public Class FrmMain
             AddLog($"カメラからの温度取得に失敗しました (エラーコード: {ret})")
         End If
 
-        ' 現在の冷却パワー取得（これが0なら冷却が動いていない証拠）
-        ret = ASI_SDK.ASIGetControlValue(CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_COOLER_POWER, coolerPower, isAuto)
-        If ret <> 0 Then
-            AddLog($"カメラからの冷却パワー取得に失敗しました (エラーコード: {ret})")
-        End If
+        ' ==========================================================
+        ' ★修正：冷却パワーの取得（冷却対応カメラ FrmMain.HasCooler が True の時のみ実行）
+        ' ==========================================================
+        If FrmMain.HasCooler Then
+            ret = ASI_SDK.ASIGetControlValue(CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_COOLER_POWER, coolerPower, isAuto)
+            If ret <> 0 Then
+                ' 瞬間的な通信エラー等でのログ連投を防ぐため、Debug出力へ変更
+                Debug.WriteLine($"[ZWO] カメラからの冷却パワー取得に失敗しました (エラーコード: {ret})")
+            End If
 
-        LblStatusTemp.Text = $"Sensor: {tempX10 / 10.0:F1} ℃ (Power: {coolerPower})"
+            ' 冷却対応カメラ用のUI表示
+            LblStatusTemp.Text = $"Sensor: {tempX10 / 10.0:F1} ℃ (Power: {coolerPower})"
+        Else
+            ' 冷却非対応カメラ用のUI表示 (Power表記を省いてスッキリさせる)
+            LblStatusTemp.Text = $"Sensor: {tempX10 / 10.0:F1} ℃"
+        End If
     End Sub
 
     ' ==========================================================
@@ -1725,18 +1770,41 @@ Public Class FrmMain
         UpdateGammaLut()
     End Sub
 
+    '' ==========================================================
+    '' ガンマ補正用LUTを作り直すメソッド（スライダー操作時のみ実行）
+    '' ==========================================================
+    'Private Sub UpdateGammaLut()
+    '    ' 新しいテーブルを作成
+    '    Dim newLut As New Mat(1, 256, MatType.CV_8UC1)
+    '    Dim indexer = newLut.GetGenericIndexer(Of Byte)()
+
+    '    For i As Integer = 0 To 255
+    '        Dim val As Double = Math.Pow(i / 255.0, _displayGamma) * 255.0
+    '        indexer(0, i) = CByte(Math.Max(0, Math.Min(255, val)))
+    '    Next
+
+    '    ' 古いLUTを破棄して、新しいLUTに差し替える（安全のためにロックをかける）
+    '    SyncLock _lutLock
+    '        If _gammaLut IsNot Nothing AndAlso Not _gammaLut.IsDisposed Then
+    '            _gammaLut.Dispose()
+    '        End If
+    '        _gammaLut = newLut
+    '    End SyncLock
+    'End Sub
+
     ' ==========================================================
     ' ガンマ補正用LUTを作り直すメソッド（スライダー操作時のみ実行）
     ' ==========================================================
     Private Sub UpdateGammaLut()
-        ' 新しいテーブルを作成
-        Dim newLut As New Mat(1, 256, MatType.CV_8UC1)
-        Dim indexer = newLut.GetGenericIndexer(Of Byte)()
-
+        ' 1. まずは通常のByte配列（256要素）を用意してガンマ値を計算する
+        Dim lutBytes(255) As Byte
         For i As Integer = 0 To 255
             Dim val As Double = Math.Pow(i / 255.0, _displayGamma) * 255.0
-            indexer(0, i) = CByte(Math.Max(0, Math.Min(255, val)))
+            lutBytes(i) = CByte(Math.Max(0, Math.Min(255, val)))
         Next
+
+        ' 2. 計算済みの配列から、一気に安全かつ爆速でMat（1行256列）を生成！
+        Dim newLut As Mat = Mat.FromPixelData(1, 256, MatType.CV_8UC1, lutBytes)
 
         ' 古いLUTを破棄して、新しいLUTに差し替える（安全のためにロックをかける）
         SyncLock _lutLock
@@ -1746,7 +1814,6 @@ Public Class FrmMain
             _gammaLut = newLut
         End SyncLock
     End Sub
-
 
     ' 設定を変数に読み込み、検知エンジンにセットする専用メソッド
     Private Sub ReloadDetectSettings()

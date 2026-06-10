@@ -23,6 +23,7 @@ Partial Class FrmMain
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FrmMain))
         PicMain = New PictureBox()
         BtnStart = New Button()
         BtnStop = New Button()
@@ -38,6 +39,8 @@ Partial Class FrmMain
         TxtFileName = New TextBox()
         BtnOpenFile = New Button()
         PnlZwoSettings = New Panel()
+        Label2 = New Label()
+        CmbRoiSelect = New ComboBox()
         BtnZwoSettings = New Button()
         GrpWB = New GroupBox()
         Lbl_B = New Label()
@@ -86,6 +89,7 @@ Partial Class FrmMain
         PnlRtspSettings = New Panel()
         Label1 = New Label()
         TxtRtspUrl = New TextBox()
+        ChkShowTimestamp = New CheckBox()
         CType(PicMain, ComponentModel.ISupportInitialize).BeginInit()
         GrpSource.SuspendLayout()
         PnlVideoSettings.SuspendLayout()
@@ -262,6 +266,8 @@ Partial Class FrmMain
         ' 
         ' PnlZwoSettings
         ' 
+        PnlZwoSettings.Controls.Add(Label2)
+        PnlZwoSettings.Controls.Add(CmbRoiSelect)
         PnlZwoSettings.Controls.Add(BtnZwoSettings)
         PnlZwoSettings.Controls.Add(GrpWB)
         PnlZwoSettings.Controls.Add(GrpExp)
@@ -276,6 +282,24 @@ Partial Class FrmMain
         PnlZwoSettings.Name = "PnlZwoSettings"
         PnlZwoSettings.Size = New Size(278, 400)
         PnlZwoSettings.TabIndex = 6
+        ' 
+        ' Label2
+        ' 
+        Label2.AutoSize = True
+        Label2.Location = New Point(4, 62)
+        Label2.Name = "Label2"
+        Label2.Size = New Size(26, 15)
+        Label2.TabIndex = 30
+        Label2.Text = "ROI"
+        ' 
+        ' CmbRoiSelect
+        ' 
+        CmbRoiSelect.FormattingEnabled = True
+        CmbRoiSelect.Items.AddRange(New Object() {"0: 全画面 (100%)", "1: 中央 95% 切り出し", "2: 中央 90% 切り出し", "3: 中央 85% 切り出し", "4: 中央 80% 切り出し"})
+        CmbRoiSelect.Location = New Point(51, 59)
+        CmbRoiSelect.Name = "CmbRoiSelect"
+        CmbRoiSelect.Size = New Size(223, 23)
+        CmbRoiSelect.TabIndex = 29
         ' 
         ' BtnZwoSettings
         ' 
@@ -294,11 +318,11 @@ Partial Class FrmMain
         GrpWB.Controls.Add(ChkWBAuto)
         GrpWB.Controls.Add(TrkbWbB)
         GrpWB.Controls.Add(TrkbWbR)
-        GrpWB.Location = New Point(3, 240)
+        GrpWB.Location = New Point(3, 269)
         GrpWB.Margin = New Padding(2)
         GrpWB.Name = "GrpWB"
         GrpWB.Padding = New Padding(2)
-        GrpWB.Size = New Size(273, 146)
+        GrpWB.Size = New Size(273, 129)
         GrpWB.TabIndex = 27
         GrpWB.TabStop = False
         GrpWB.Text = "ホワイトバランス"
@@ -306,7 +330,7 @@ Partial Class FrmMain
         ' Lbl_B
         ' 
         Lbl_B.AutoSize = True
-        Lbl_B.Location = New Point(14, 89)
+        Lbl_B.Location = New Point(13, 83)
         Lbl_B.Margin = New Padding(2, 0, 2, 0)
         Lbl_B.Name = "Lbl_B"
         Lbl_B.Size = New Size(14, 15)
@@ -316,7 +340,7 @@ Partial Class FrmMain
         ' Lbl_R
         ' 
         Lbl_R.AutoSize = True
-        Lbl_R.Location = New Point(14, 40)
+        Lbl_R.Location = New Point(13, 44)
         Lbl_R.Margin = New Padding(2, 0, 2, 0)
         Lbl_R.Name = "Lbl_R"
         Lbl_R.Size = New Size(14, 15)
@@ -326,7 +350,7 @@ Partial Class FrmMain
         ' LblWb
         ' 
         LblWb.AutoSize = True
-        LblWb.Location = New Point(130, 18)
+        LblWb.Location = New Point(110, 18)
         LblWb.Margin = New Padding(2, 0, 2, 0)
         LblWb.Name = "LblWb"
         LblWb.Size = New Size(50, 15)
@@ -336,7 +360,7 @@ Partial Class FrmMain
         ' ChkWBAuto
         ' 
         ChkWBAuto.AutoSize = True
-        ChkWBAuto.Location = New Point(10, 17)
+        ChkWBAuto.Location = New Point(9, 20)
         ChkWBAuto.Margin = New Padding(2)
         ChkWBAuto.Name = "ChkWBAuto"
         ChkWBAuto.Size = New Size(51, 19)
@@ -346,7 +370,7 @@ Partial Class FrmMain
         ' 
         ' TrkbWbB
         ' 
-        TrkbWbB.Location = New Point(32, 89)
+        TrkbWbB.Location = New Point(32, 78)
         TrkbWbB.Margin = New Padding(2)
         TrkbWbB.Name = "TrkbWbB"
         TrkbWbB.Size = New Size(236, 45)
@@ -354,7 +378,7 @@ Partial Class FrmMain
         ' 
         ' TrkbWbR
         ' 
-        TrkbWbR.Location = New Point(32, 40)
+        TrkbWbR.Location = New Point(31, 39)
         TrkbWbR.Margin = New Padding(2)
         TrkbWbR.Name = "TrkbWbR"
         TrkbWbR.Size = New Size(237, 45)
@@ -365,7 +389,7 @@ Partial Class FrmMain
         GrpExp.Controls.Add(LblExp)
         GrpExp.Controls.Add(ChkExpAuto)
         GrpExp.Controls.Add(TrkbExp)
-        GrpExp.Location = New Point(3, 149)
+        GrpExp.Location = New Point(3, 178)
         GrpExp.Margin = New Padding(2)
         GrpExp.Name = "GrpExp"
         GrpExp.Padding = New Padding(2)
@@ -408,7 +432,7 @@ Partial Class FrmMain
         GrpGain.Controls.Add(LblGain)
         GrpGain.Controls.Add(ChkGainAuto)
         GrpGain.Controls.Add(TrkbGain)
-        GrpGain.Location = New Point(2, 58)
+        GrpGain.Location = New Point(2, 87)
         GrpGain.Margin = New Padding(2)
         GrpGain.Name = "GrpGain"
         GrpGain.Padding = New Padding(2)
@@ -767,11 +791,25 @@ Partial Class FrmMain
         TxtRtspUrl.TabIndex = 0
         TxtRtspUrl.Text = "rtsp://192.168.x.x:8554/live"
         ' 
+        ' ChkShowTimestamp
+        ' 
+        ChkShowTimestamp.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
+        ChkShowTimestamp.AutoSize = True
+        ChkShowTimestamp.Checked = True
+        ChkShowTimestamp.CheckState = CheckState.Checked
+        ChkShowTimestamp.Location = New Point(615, 677)
+        ChkShowTimestamp.Name = "ChkShowTimestamp"
+        ChkShowTimestamp.Size = New Size(135, 19)
+        ChkShowTimestamp.TabIndex = 22
+        ChkShowTimestamp.Text = "映像に時刻を表示する"
+        ChkShowTimestamp.UseVisualStyleBackColor = True
+        ' 
         ' FrmMain
         ' 
         AutoScaleDimensions = New SizeF(96F, 96F)
         AutoScaleMode = AutoScaleMode.Dpi
         ClientSize = New Size(1264, 785)
+        Controls.Add(ChkShowTimestamp)
         Controls.Add(PnlVideoSettings)
         Controls.Add(PnlRtspSettings)
         Controls.Add(PnlZwoSettings)
@@ -796,6 +834,7 @@ Partial Class FrmMain
         Controls.Add(BtnStop)
         Controls.Add(BtnStart)
         Controls.Add(PicMain)
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Margin = New Padding(2)
         MinimumSize = New Size(1280, 824)
         Name = "FrmMain"
@@ -893,4 +932,7 @@ Partial Class FrmMain
     Friend WithEvents PnlRtspSettings As Panel
     Friend WithEvents TxtRtspUrl As TextBox
     Friend WithEvents Label1 As Label
+    Friend WithEvents ChkShowTimestamp As CheckBox
+    Friend WithEvents CmbRoiSelect As ComboBox
+    Friend WithEvents Label2 As Label
 End Class

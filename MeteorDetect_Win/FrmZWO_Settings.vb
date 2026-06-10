@@ -22,11 +22,11 @@
 
         ' 2. カメラに「持っている機能と限界値」を自己申告させる
         Dim numCtrl As Integer = 0
-        ASI_SDK.ASIGetNumOfControls(FrmMain.CamID, numCtrl)
+        Dim ret = ASI_SDK.ASIGetNumOfControls(FrmMain.CamID, numCtrl)
 
         For i As Integer = 0 To numCtrl - 1
             Dim caps As New ASI_SDK.ASI_CONTROL_CAPS()
-            ASI_SDK.ASIGetControlCaps(FrmMain.CamID, i, caps)
+            ret = ASI_SDK.ASIGetControlCaps(FrmMain.CamID, i, caps)
 
             Select Case caps.ControlType
                 Case ASI_SDK.ASI_CONTROL_TYPE.ASI_BANDWIDTHOVERLOAD
@@ -125,7 +125,7 @@
         LblUsbBandwidth.Text = $"USB帯域 (Def: {LblUsbBandwidth.Tag}%): {TrcUsbBandwidth.Value}%"
 
         If FrmMain.CamID <> -1 Then
-            ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_BANDWIDTHOVERLOAD, TrcUsbBandwidth.Value, 0)
+            Dim ret = ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_BANDWIDTHOVERLOAD, TrcUsbBandwidth.Value, 0)
         End If
     End Sub
 
@@ -135,7 +135,7 @@
 
         If FrmMain.CamID <> -1 Then
             Dim val As Integer = If(ChkHighSpeed.Checked, 1, 0)
-            ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_HIGH_SPEED_MODE, val, 0)
+            Dim ret = ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_HIGH_SPEED_MODE, val, 0)
         End If
     End Sub
 
@@ -147,10 +147,10 @@
             FrmMain.IsExternalChanging = True
 
             Dim isOn As Integer = If(ChkCoolerOn.Checked, 1, 0)
-            ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_COOLER_ON, isOn, 0)
+            Dim ret = ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_COOLER_ON, isOn, 0)
 
             If isOn = 1 Then
-                ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_TARGET_TEMP, TrcTargetTemp.Value, 0)
+                ret = ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_TARGET_TEMP, TrcTargetTemp.Value, 0)
             End If
         End If
     End Sub
@@ -164,7 +164,7 @@
 
         If FrmMain.CamID <> -1 Then
             FrmMain.IsExternalChanging = True
-            ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_TARGET_TEMP, TrcTargetTemp.Value, 0)
+            Dim ret = ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_TARGET_TEMP, TrcTargetTemp.Value, 0)
         End If
     End Sub
 
@@ -183,8 +183,8 @@
 
         ' 4. カメラが接続中なら、冷却などの安全な設定のみ即座に反映させる
         If FrmMain.CamID <> -1 Then
-            ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_TARGET_TEMP, TrcTargetTemp.Value, 0)
-            ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_COOLER_ON, If(ChkCoolerOn.Checked, 1, 0), 0)
+            Dim ret = ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_TARGET_TEMP, TrcTargetTemp.Value, 0)
+            ret = ASI_SDK.ASISetControlValue(FrmMain.CamID, ASI_SDK.ASI_CONTROL_TYPE.ASI_COOLER_ON, If(ChkCoolerOn.Checked, 1, 0), 0)
 
             ' ★注意: ASI_FLIP は絶対に送らない！（ハードウェア反転による色化けを防ぐため）
             ' 裏で動いている ClsZwoCamera.vb が、保存された My.Settings.ZwoFlip を読み取って、

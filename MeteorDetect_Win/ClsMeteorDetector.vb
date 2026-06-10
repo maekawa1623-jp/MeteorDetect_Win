@@ -2,7 +2,7 @@
 
 Public Class ClsMeteorDetector
     ' 過去の差分画像を保持するキュー
-    Private _diffQueue As New Queue(Of Mat)()
+    Private ReadOnly _diffQueue As New Queue(Of Mat)()
     Private _prevFrame As Mat
     Private _queueSize As Integer = 15 ' 15fpsで1秒分（環境に合わせて調整可）
 
@@ -97,11 +97,35 @@ Public Class ClsMeteorDetector
         End If
         ' ==========================================================
 
+        ' ==========================================================
+        ' ★修正・追加ここから：ROI変更（サイズ不一致）によるクラッシュを完全に防ぐバリア
+        ' ==========================================================
+        ' 過去の画像が残っているが、現在の画像とサイズが違う場合（ROI変更時など）
+        If _prevFrame IsNot Nothing AndAlso Not _prevFrame.IsDisposed Then
+            If _prevFrame.Size() <> gray.Size() Then
+                ' サイズが違う古い過去画像は使えないので破棄する
+                _prevFrame.Dispose()
+                _prevFrame = Nothing
+
+                ' キューに溜まっている過去の差分画像もサイズが違うので全クリア
+                While _diffQueue.Count > 0
+                    Dim old = _diffQueue.Dequeue()
+                    If old IsNot Nothing Then old.Dispose()
+                End While
+
+                Debug.WriteLine("解像度(ROI)の変更を検知したため、検知エンジンをリセットしました。")
+            End If
+        End If
+
+        ' 比較対象の過去フレームがない場合は、現在のフレームを記憶して今回は終了
         If _prevFrame Is Nothing OrElse _prevFrame.IsDisposed Then
             _prevFrame = gray.Clone()
             gray.Dispose()
             Return Nothing
         End If
+        ' ==========================================================
+        ' ★修正・追加ここまで
+        ' ==========================================================
 
         ' 4. 差分抽出
         Dim diff As New Mat()
@@ -132,7 +156,7 @@ Public Class ClsMeteorDetector
         Next
 
         ' 7. 直線抽出 (Usingを使って中間Matを自動解放)
-        Dim lines() As LineSegmentPoint = Nothing
+        'Dim lines() As LineSegmentPoint = Nothing
         Using blur As New Mat(), canny As New Mat()
             ' ガウシアンぼかし
             Dim bSize As Integer = CInt(Math.Round(BlurSize * scaleFactor))
@@ -143,7 +167,7 @@ Public Class ClsMeteorDetector
             Cv2.Canny(blur, canny, CannyThreshold1, CannyThreshold2, 3)
 
             ' ハフ変換
-            lines = Cv2.HoughLinesP(canny, 1, Math.PI / 180, HoughThreshold, dynamicMinLineLength, dynamicMaxLineGap)
+            Dim lines = Cv2.HoughLinesP(canny, 1, Math.PI / 180, HoughThreshold, dynamicMinLineLength, dynamicMaxLineGap)
 
             ' デバッグ画像の生成（Using内で行うことでCannyを安全に参照）
             Dim debugMat As Mat = Nothing
@@ -165,14 +189,21 @@ Public Class ClsMeteorDetector
     End Function
 
     Public Sub Reset()
+        ' ★ここを追加：過去のフレーム記憶を完全に消去する
         If _prevFrame IsNot Nothing Then
-            _prevFrame.Dispose()
+            If Not _prevFrame.IsDisposed Then _prevFrame.Dispose()
             _prevFrame = Nothing
         End If
-        While _diffQueue.Count > 0
-            Dim d = _diffQueue.Dequeue()
-            d.Dispose()
-        End While
+
+        ' ★ここを追加：過去の差分キューのメモリもすべて解放して空にする
+        If _diffQueue IsNot Nothing Then
+            While _diffQueue.Count > 0
+                Dim old = _diffQueue.Dequeue()
+                If old IsNot Nothing Then old.Dispose()
+            End While
+        End If
+
+        ' （その他、既存のカウンタやリストのリセット処理など）
         DetectedLines.Clear()
     End Sub
 End Class
