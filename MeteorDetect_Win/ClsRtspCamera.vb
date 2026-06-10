@@ -21,11 +21,14 @@ Public Class ClsRtspCamera
         End Get
     End Property
 
+
     ' 引数の deviceIndex はインターフェースのルール上存在しますが、RTSPでは使いません
     Public Function StartCamera(deviceIndex As Integer) As Boolean Implements ICameraProvider.StartCamera
         If String.IsNullOrEmpty(ConnectionUrl) Then Return False
 
         Try
+
+
             ' FFmpegバックエンドを明示的に指定してネットワークストリームを開く
             _capture = New VideoCapture(ConnectionUrl, VideoCaptureAPIs.FFMPEG)
 
@@ -46,15 +49,25 @@ Public Class ClsRtspCamera
         End Try
     End Function
 
+
     Private Sub CaptureLoop()
         Dim frame As New Mat()
+        Dim frameCounter As Integer = 0 ' ★追加：間引き処理のためのカウンター
 
         While _isRunning
             Try
-                ' ネットワーク経由のため、パケットロスで一時的に空フレームが返ることがある
-                If _capture.Read(frame) AndAlso Not frame.Empty() Then
-                    ' クローンを渡してメインスレッドの処理と切り離す
-                    RaiseEvent FrameArrived(frame.Clone())
+                ' ★修正：Grab() は1回だけ！まずは「受信（コマを進める）」を全力で行う
+                If _capture.Grab() Then
+                    frameCounter += 1
+
+                    ' ★変更：Mod 2（2回に1回）だけ解凍して処理する
+                    ' これにより、PCの処理能力を超えずに約10〜15FPSの安定した速度を維持します
+                    If frameCounter Mod 2 = 0 Then
+                        If _capture.Retrieve(frame) AndAlso Not frame.Empty() Then
+                            ' クローンを渡してメインスレッドの処理と切り離す
+                            RaiseEvent FrameArrived(frame.Clone())
+                        End If
+                    End If
                 Else
                     ' 映像が途切れた場合は少し休んでリトライ（CPU負荷暴走防止）
                     Thread.Sleep(10)
@@ -67,6 +80,7 @@ Public Class ClsRtspCamera
 
         If frame IsNot Nothing Then frame.Dispose()
     End Sub
+
 
     Public Sub StopCamera() Implements ICameraProvider.StopCamera
         _isRunning = False
