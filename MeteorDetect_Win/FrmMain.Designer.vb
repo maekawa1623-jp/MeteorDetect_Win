@@ -90,6 +90,7 @@ Partial Class FrmMain
         Label1 = New Label()
         TxtRtspUrl = New TextBox()
         ChkShowTimestamp = New CheckBox()
+        TmrScheduler = New Timer(components)
         CType(PicMain, ComponentModel.ISupportInitialize).BeginInit()
         GrpSource.SuspendLayout()
         PnlVideoSettings.SuspendLayout()
@@ -593,11 +594,10 @@ Partial Class FrmMain
         LstLogs.ForeColor = Color.LimeGreen
         LstLogs.FormattingEnabled = True
         LstLogs.HorizontalScrollbar = True
-        LstLogs.IntegralHeight = False
         LstLogs.Location = New Point(11, 575)
         LstLogs.Margin = New Padding(2)
         LstLogs.Name = "LstLogs"
-        LstLogs.Size = New Size(600, 183)
+        LstLogs.Size = New Size(600, 180)
         LstLogs.TabIndex = 7
         ' 
         ' ChkShowSub
@@ -752,14 +752,13 @@ Partial Class FrmMain
         ' ChkEnableDetect
         ' 
         ChkEnableDetect.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
-        ChkEnableDetect.AutoSize = True
         ChkEnableDetect.Checked = True
         ChkEnableDetect.CheckState = CheckState.Checked
         ChkEnableDetect.Font = New Font("Yu Gothic UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, CByte(128))
         ChkEnableDetect.Location = New Point(615, 704)
         ChkEnableDetect.Margin = New Padding(2)
         ChkEnableDetect.Name = "ChkEnableDetect"
-        ChkEnableDetect.Size = New Size(167, 24)
+        ChkEnableDetect.Size = New Size(355, 24)
         ChkEnableDetect.TabIndex = 21
         ChkEnableDetect.Text = "流星検知を有効にする"
         ChkEnableDetect.UseVisualStyleBackColor = True
@@ -803,6 +802,11 @@ Partial Class FrmMain
         ChkShowTimestamp.TabIndex = 22
         ChkShowTimestamp.Text = "映像に時刻を表示する"
         ChkShowTimestamp.UseVisualStyleBackColor = True
+        ' 
+        ' TmrScheduler
+        ' 
+        TmrScheduler.Enabled = True
+        TmrScheduler.Interval = 60000
         ' 
         ' FrmMain
         ' 
@@ -935,4 +939,5 @@ Partial Class FrmMain
     Friend WithEvents ChkShowTimestamp As CheckBox
     Friend WithEvents CmbRoiSelect As ComboBox
     Friend WithEvents Label2 As Label
+    Friend WithEvents TmrScheduler As Timer
 End Class

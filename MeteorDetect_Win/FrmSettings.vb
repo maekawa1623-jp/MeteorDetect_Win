@@ -72,6 +72,14 @@ Public Class FrmSettings
         TrcPostRoll.Value = CInt(My.Settings.SysPostRoll)
         LblPostRoll.Text = $"録画後 (Def:4s): {TrcPostRoll.Value}s"
 
+        ' ==========================================
+        ' スケジュール設定の初期化
+        ' ==========================================
+        ChkEnableSchedule.Checked = My.Settings.SysEnableSchedule
+
+        ' "HH:mm"の文字列を日時に変換してセットする（日付は適当な今日の日付になります）
+        DtpStart.Value = DateTime.ParseExact(My.Settings.SysScheduleStart, "HH:mm", Nothing)
+        DtpEnd.Value = DateTime.ParseExact(My.Settings.SysScheduleEnd, "HH:mm", Nothing)
 
     End Sub
 
@@ -216,8 +224,13 @@ Public Class FrmSettings
         My.Settings.SysClaheClip = TrcClaheClip.Value / 10.0
 
         ' ==========================================
-        ' [タブ4: SNS設定] の保存
+        ' スケジュール設定の保存
         ' ==========================================
+        My.Settings.SysEnableSchedule = ChkEnableSchedule.Checked
+
+        ' 時刻だけを "HH:mm" の文字列として保存
+        My.Settings.SysScheduleStart = DtpStart.Value.ToString("HH:mm")
+        My.Settings.SysScheduleEnd = DtpEnd.Value.ToString("HH:mm")
 
         ' すべての設定をディスクに書き込んで記憶させる
         My.Settings.Save()

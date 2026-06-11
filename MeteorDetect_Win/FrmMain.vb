@@ -183,6 +183,9 @@ Public Class FrmMain
             BtnStop.Enabled = False
             LblStatusMessage.Text = "準備完了"
 
+            ' ★ここに追加
+            UpdateScheduleUI()
+
             AddLog($"{BasConst.APP_NAME} を起動しました。")
 
         Catch ex As Exception
@@ -1061,6 +1064,11 @@ Public Class FrmMain
                 ' ★ 設定画面で「OK」が押されたら、最新の設定を変数とエンジンに再読み込み！
                 ReloadDetectSettings()
 
+                ' ====================================================
+                ' ★ ここに追加！設定が変わったのでスケジュールの表示も更新する
+                UpdateScheduleUI()
+                ' ====================================================
+
                 ' OKボタンで閉じられたら、設定変更のログだけを出す
                 AddLog($"設定を更新しました。保存先: [{My.Settings.SaveDirectoryBase}]")
 
@@ -1878,5 +1886,103 @@ Public Class FrmMain
             IsAsiMode = False
             UpdateSettingsPanel() ' パネルを最前面へ切り替え
         End If
+    End Sub
+
+
+    ''' <summary>
+    ''' 現在の時刻が、設定された観測時間帯に入っているかどうかを判定する（日またぎ対応）
+    ''' </summary>
+    Private Function IsWithinObservationTime() As Boolean
+        Try
+            ' 1. 現在の時刻（時:分:秒）を取得
+            Dim nowTime As TimeSpan = DateTime.Now.TimeOfDay
+
+            ' 2. 設定画面から保存された「開始時間」と「終了時間」を読み込む
+            Dim startTime As TimeSpan = TimeSpan.Parse(My.Settings.SysScheduleStart)
+            Dim endTime As TimeSpan = TimeSpan.Parse(My.Settings.SysScheduleEnd)
+
+            ' 3. 時間帯の判定
+            If startTime <= endTime Then
+                ' パターンA：日をまたがない場合（例：19:30 ～ 23:50）
+                Return (nowTime >= startTime AndAlso nowTime <= endTime)
+            Else
+                ' パターンB：★日をまたぐ場合（例：19:30 ～ 翌04:00）
+                ' 「開始時刻以降」または「終了時刻以前（夜中0時以降）」なら時間内とみなす
+                Return (nowTime >= startTime OrElse nowTime <= endTime)
+            End If
+        Catch ex As Exception
+            ' 万が一設定値がおかしい場合は、安全のため「常に時間内（True）」として動かす
+            Return True
+        End Try
+    End Function
+
+    Private Sub TmrScheduler_Tick(sender As Object, e As EventArgs) Handles TmrScheduler.Tick
+        ' ==========================================================
+        ' ルール1：スケジュール機能が無効、または動画再生モードなら何もしない
+        ' ==========================================================
+        If Not My.Settings.SysEnableSchedule OrElse RdoVideo.Checked Then Return
+
+        ' ==========================================================
+        ' ルール2：時間帯に合わせて、「検知チェックボックス」だけを自動で切り替える
+        ' ==========================================================
+        Dim isObservationTime As Boolean = IsWithinObservationTime()
+
+        If isObservationTime Then
+            ' 【観測時間内の場合】
+            ' もしチェックが外れていたら、自動でチェックを入れる
+            If Not ChkEnableDetect.Checked Then
+                ChkEnableDetect.Checked = True ' ここで連動して _enableDetect も True になります
+                AddLog("【スケジュール】観測時間になったため、流星検知を自動で [有効] にしました。")
+            End If
+        Else
+            ' 【観測時間外の場合（昼間など）】
+            ' もしチェックが入ってしまっていたら、自動でチェックを外す
+            If ChkEnableDetect.Checked Then
+                ChkEnableDetect.Checked = False ' ここで連動して _enableDetect も False になります
+                AddLog("【スケジュール】観測時間が終了したため、流星検知を自動で [無効] にしました。")
+            End If
+        End If
+
+        ' ★ここに追加（時間が進んだり、日をまたいだりした時のために表示を更新）
+        UpdateScheduleUI()
+
+    End Sub
+
+    ' ==========================================================
+    ' スケジュールの状態を画面（チェックボックスの文字）に表示する
+    ' ==========================================================
+    Private Sub UpdateScheduleUI()
+        Try
+            ' 1. スケジュールが無効の場合
+            If Not My.Settings.SysEnableSchedule Then
+                ChkEnableDetect.Text = "流星検知を有効にする (手動モード)"
+                'ChkEnableDetect.ForeColor = Color.White ' 通常の色
+                Return
+            End If
+
+            ' 2. 動画再生モードの場合（スケジュールは無視される）
+            If RdoVideo.Checked Then
+                ChkEnableDetect.Text = "流星検知 (スケジュール無効: 動画再生中)"
+                'ChkEnableDetect.ForeColor = Color.Orange
+                Return
+            End If
+
+            ' 3. スケジュール有効 ＆ ライブカメラの場合
+            Dim startTime As String = My.Settings.SysScheduleStart
+            Dim endTime As String = My.Settings.SysScheduleEnd
+
+            If IsWithinObservationTime() Then
+                ' 時間内の場合
+                ChkEnableDetect.Text = $"流星検知 (自動観測中: ～{endTime}まで)"
+                'ChkEnableDetect.ForeColor = Color.LightGreen ' 動いていることが分かりやすい色
+            Else
+                ' 時間外（昼間など）の場合
+                ChkEnableDetect.Text = $"流星検知 (自動待機中: {startTime}から開始)"
+                'ChkEnableDetect.ForeColor = Color.LightSkyBlue
+            End If
+
+        Catch ex As Exception
+            ChkEnableDetect.Text = "流星検知を有効にする"
+        End Try
     End Sub
 End Class

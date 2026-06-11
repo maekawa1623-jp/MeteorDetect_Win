@@ -62,5 +62,14 @@
     <Setting Name="RtspUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">rtsp://5111:6132@192.168.0.53/live</Value>
     </Setting>
+    <Setting Name="SysEnableSchedule" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="SysScheduleStart" Type="System.String" Scope="User">
+      <Value Profile="(Default)">21:30</Value>
+    </Setting>
+    <Setting Name="SysScheduleEnd" Type="System.String" Scope="User">
+      <Value Profile="(Default)">04:00</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

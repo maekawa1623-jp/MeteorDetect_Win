@@ -32,6 +32,7 @@ Partial Class FrmSettings
         TxtSavePath = New TextBox()
         Label1 = New Label()
         TabDetect = New TabPage()
+        Label13 = New Label()
         GroupBox1 = New GroupBox()
         LblClaheClip = New Label()
         TrcClaheClip = New TrackBar()
@@ -63,10 +64,15 @@ Partial Class FrmSettings
         LblPreRoll = New Label()
         Label10 = New Label()
         TrcPreRoll = New TrackBar()
-        TabSNS = New TabPage()
+        TabSchedule = New TabPage()
         BtnCancel = New Button()
         BtnOK = New Button()
-        Label13 = New Label()
+        GroupBox2 = New GroupBox()
+        ChkEnableSchedule = New CheckBox()
+        Label14 = New Label()
+        DtpStart = New DateTimePicker()
+        DtpEnd = New DateTimePicker()
+        Label15 = New Label()
         TabControl.SuspendLayout()
         TabSave.SuspendLayout()
         TabDetect.SuspendLayout()
@@ -80,6 +86,8 @@ Partial Class FrmSettings
         TabRecord.SuspendLayout()
         CType(TrcPostRoll, ComponentModel.ISupportInitialize).BeginInit()
         CType(TrcPreRoll, ComponentModel.ISupportInitialize).BeginInit()
+        TabSchedule.SuspendLayout()
+        GroupBox2.SuspendLayout()
         SuspendLayout()
         ' 
         ' TabControl
@@ -87,7 +95,7 @@ Partial Class FrmSettings
         TabControl.Controls.Add(TabSave)
         TabControl.Controls.Add(TabDetect)
         TabControl.Controls.Add(TabRecord)
-        TabControl.Controls.Add(TabSNS)
+        TabControl.Controls.Add(TabSchedule)
         TabControl.Dock = DockStyle.Top
         TabControl.Location = New Point(0, 0)
         TabControl.Name = "TabControl"
@@ -202,6 +210,14 @@ Partial Class FrmSettings
         TabDetect.TabIndex = 1
         TabDetect.Text = "検知設定"
         TabDetect.UseVisualStyleBackColor = True
+        ' 
+        ' Label13
+        ' 
+        Label13.Location = New Point(334, 288)
+        Label13.Name = "Label13"
+        Label13.Size = New Size(230, 48)
+        Label13.TabIndex = 35
+        Label13.Text = "空の明るさ（光害・月明かり）を自動補正し、星や淡い流星をくっきりと浮き上がらせます"
         ' 
         ' GroupBox1
         ' 
@@ -500,15 +516,16 @@ Partial Class FrmSettings
         TrcPreRoll.TabIndex = 0
         TrcPreRoll.Value = 3
         ' 
-        ' TabSNS
+        ' TabSchedule
         ' 
-        TabSNS.Location = New Point(4, 24)
-        TabSNS.Name = "TabSNS"
-        TabSNS.Padding = New Padding(3)
-        TabSNS.Size = New Size(578, 410)
-        TabSNS.TabIndex = 3
-        TabSNS.Text = "SNS設定"
-        TabSNS.UseVisualStyleBackColor = True
+        TabSchedule.Controls.Add(GroupBox2)
+        TabSchedule.Location = New Point(4, 24)
+        TabSchedule.Name = "TabSchedule"
+        TabSchedule.Padding = New Padding(3)
+        TabSchedule.Size = New Size(578, 410)
+        TabSchedule.TabIndex = 3
+        TabSchedule.Text = "スケジュール"
+        TabSchedule.UseVisualStyleBackColor = True
         ' 
         ' BtnCancel
         ' 
@@ -528,13 +545,75 @@ Partial Class FrmSettings
         BtnOK.Text = "OK"
         BtnOK.UseVisualStyleBackColor = True
         ' 
-        ' Label13
+        ' GroupBox2
         ' 
-        Label13.Location = New Point(334, 288)
-        Label13.Name = "Label13"
-        Label13.Size = New Size(230, 48)
-        Label13.TabIndex = 35
-        Label13.Text = "空の明るさ（光害・月明かり）を自動補正し、星や淡い流星をくっきりと浮き上がらせます"
+        GroupBox2.Controls.Add(Label15)
+        GroupBox2.Controls.Add(DtpEnd)
+        GroupBox2.Controls.Add(DtpStart)
+        GroupBox2.Controls.Add(Label14)
+        GroupBox2.Controls.Add(ChkEnableSchedule)
+        GroupBox2.Location = New Point(8, 6)
+        GroupBox2.Name = "GroupBox2"
+        GroupBox2.Size = New Size(334, 92)
+        GroupBox2.TabIndex = 0
+        GroupBox2.TabStop = False
+        GroupBox2.Text = "自動観測スケジュール"
+        ' 
+        ' ChkEnableSchedule
+        ' 
+        ChkEnableSchedule.AutoSize = True
+        ChkEnableSchedule.Checked = True
+        ChkEnableSchedule.CheckState = CheckState.Checked
+        ChkEnableSchedule.Location = New Point(6, 22)
+        ChkEnableSchedule.Name = "ChkEnableSchedule"
+        ChkEnableSchedule.Size = New Size(165, 19)
+        ChkEnableSchedule.TabIndex = 0
+        ChkEnableSchedule.Text = "スケジュール機能を有効にする"
+        ChkEnableSchedule.UseVisualStyleBackColor = True
+        ' 
+        ' Label14
+        ' 
+        Label14.AutoSize = True
+        Label14.Font = New Font("Yu Gothic UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(128))
+        Label14.Location = New Point(6, 44)
+        Label14.Name = "Label14"
+        Label14.Size = New Size(107, 25)
+        Label14.TabIndex = 1
+        Label14.Text = "観測時間："
+        ' 
+        ' DtpStart
+        ' 
+        DtpStart.CustomFormat = "HH:mm"
+        DtpStart.Font = New Font("Yu Gothic UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(128))
+        DtpStart.Format = DateTimePickerFormat.Custom
+        DtpStart.Location = New Point(119, 47)
+        DtpStart.Name = "DtpStart"
+        DtpStart.ShowUpDown = True
+        DtpStart.Size = New Size(80, 33)
+        DtpStart.TabIndex = 2
+        DtpStart.Value = New Date(2026, 6, 11, 21, 0, 0, 0)
+        ' 
+        ' DtpEnd
+        ' 
+        DtpEnd.CustomFormat = "HH:mm"
+        DtpEnd.Font = New Font("Yu Gothic UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(128))
+        DtpEnd.Format = DateTimePickerFormat.Custom
+        DtpEnd.Location = New Point(242, 47)
+        DtpEnd.Name = "DtpEnd"
+        DtpEnd.ShowUpDown = True
+        DtpEnd.Size = New Size(80, 33)
+        DtpEnd.TabIndex = 3
+        DtpEnd.Value = New Date(2026, 6, 11, 4, 30, 0, 0)
+        ' 
+        ' Label15
+        ' 
+        Label15.AutoSize = True
+        Label15.Font = New Font("Yu Gothic UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(128))
+        Label15.Location = New Point(205, 53)
+        Label15.Name = "Label15"
+        Label15.Size = New Size(31, 25)
+        Label15.TabIndex = 4
+        Label15.Text = "～"
         ' 
         ' FrmSettings
         ' 
@@ -568,6 +647,9 @@ Partial Class FrmSettings
         TabRecord.PerformLayout()
         CType(TrcPostRoll, ComponentModel.ISupportInitialize).EndInit()
         CType(TrcPreRoll, ComponentModel.ISupportInitialize).EndInit()
+        TabSchedule.ResumeLayout(False)
+        GroupBox2.ResumeLayout(False)
+        GroupBox2.PerformLayout()
         ResumeLayout(False)
     End Sub
     Friend WithEvents TabControl As TabControl
@@ -609,10 +691,16 @@ Partial Class FrmSettings
     Friend WithEvents TrcHough As TrackBar
     Friend WithEvents TrcLineGap As TrackBar
     Friend WithEvents Label12 As Label
-    Friend WithEvents TabSNS As TabPage
+    Friend WithEvents TabSchedule As TabPage
     Friend WithEvents GroupBox1 As GroupBox
     Friend WithEvents LblClaheClip As Label
     Friend WithEvents TrcClaheClip As TrackBar
     Friend WithEvents ChkEnableClahe As CheckBox
     Friend WithEvents Label13 As Label
+    Friend WithEvents GroupBox2 As GroupBox
+    Friend WithEvents DtpStart As DateTimePicker
+    Friend WithEvents Label14 As Label
+    Friend WithEvents ChkEnableSchedule As CheckBox
+    Friend WithEvents Label15 As Label
+    Friend WithEvents DtpEnd As DateTimePicker
 End Class
