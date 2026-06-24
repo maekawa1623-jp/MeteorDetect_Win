@@ -64,6 +64,9 @@ Public Class ClsRtspCamera
     ' 【生産者】カメラから最速で映像を受け取り、最新の1枚だけを上書きする
     ' ==========================================================
     Private Sub CaptureLoop()
+        ' ★追加：最後に正常なフレームを受信した時刻を記録
+        Dim lastFrameTime As Date = Date.Now
+
         While _isRunning AndAlso _capture IsNot Nothing
             Try
                 ' 最速で受信と解凍を行う
@@ -71,30 +74,54 @@ Public Class ClsRtspCamera
                     Dim frame As New Mat()
                     If _capture.Retrieve(frame) AndAlso Not frame.Empty() Then
 
+                        ' ★フレーム取得成功！時刻を最新に更新
+                        lastFrameTime = Date.Now
+
                         SyncLock _frameLock
-                            ' ★重要：もし未処理の古いフレームが残っていたら、容赦なく破棄！
-                            If _latestFrame IsNot Nothing Then
-                                _latestFrame.Dispose()
-                            End If
+                            ' もし未処理の古いフレームが残っていたら破棄
+                            _latestFrame?.Dispose()
 
                             ' 常に「今届いた最新のフレーム」だけをセットする
                             _latestFrame = frame
 
-                            ' 処理スレッドに「新しい画像が来たよ！」と合図を送る
+                            ' 処理スレッドに合図を送る
                             Monitor.Pulse(_frameLock)
                         End SyncLock
-
                     Else
                         frame.Dispose()
                     End If
                 Else
                     Thread.Sleep(5)
                 End If
+
+                ' ==========================================================
+                ' ★追加：ウォッチドッグ（自動再接続）システム
+                ' 最後に映像を受信してから「5秒」以上経過していたら、回線が死んだと判定して蘇生する
+                ' ==========================================================
+                If (Date.Now - lastFrameTime).TotalSeconds > 5.0 Then
+                    System.Diagnostics.Debug.WriteLine("RTSPの切断を検知しました。自動再接続を行います...")
+
+                    ' 1. 死んでしまった古い接続を完全に破棄する
+                    If _capture IsNot Nothing Then
+                        _capture.Release()
+                        _capture.Dispose()
+                    End If
+
+                    ' 2. 少しだけ休ませてから、新しい接続を作り直す
+                    Thread.Sleep(500)
+                    _capture = New VideoCapture(ConnectionUrl, VideoCaptureAPIs.FFMPEG)
+                    _capture.Set(VideoCaptureProperties.BufferSize, 1)
+
+                    ' 3. タイマーをリセットして次の監視へ戻る
+                    lastFrameTime = Date.Now
+                End If
+
             Catch ex As Exception
                 Thread.Sleep(100)
             End Try
         End While
     End Sub
+
 
     ' ==========================================================
     ' 【消費者】最新の1枚を受け取り、メインへ渡す
