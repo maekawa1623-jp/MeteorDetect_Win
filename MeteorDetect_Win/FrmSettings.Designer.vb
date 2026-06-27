@@ -65,14 +65,14 @@ Partial Class FrmSettings
         Label10 = New Label()
         TrcPreRoll = New TrackBar()
         TabSchedule = New TabPage()
+        GroupBox2 = New GroupBox()
+        Label15 = New Label()
+        DtpEnd = New DateTimePicker()
+        DtpStart = New DateTimePicker()
+        Label14 = New Label()
+        ChkEnableSchedule = New CheckBox()
         BtnCancel = New Button()
         BtnOK = New Button()
-        GroupBox2 = New GroupBox()
-        ChkEnableSchedule = New CheckBox()
-        Label14 = New Label()
-        DtpStart = New DateTimePicker()
-        DtpEnd = New DateTimePicker()
-        Label15 = New Label()
         TabControl.SuspendLayout()
         TabSave.SuspendLayout()
         TabDetect.SuspendLayout()
@@ -527,6 +527,76 @@ Partial Class FrmSettings
         TabSchedule.Text = "スケジュール"
         TabSchedule.UseVisualStyleBackColor = True
         ' 
+        ' GroupBox2
+        ' 
+        GroupBox2.Controls.Add(Label15)
+        GroupBox2.Controls.Add(DtpEnd)
+        GroupBox2.Controls.Add(DtpStart)
+        GroupBox2.Controls.Add(Label14)
+        GroupBox2.Controls.Add(ChkEnableSchedule)
+        GroupBox2.Location = New Point(8, 6)
+        GroupBox2.Name = "GroupBox2"
+        GroupBox2.Size = New Size(334, 92)
+        GroupBox2.TabIndex = 0
+        GroupBox2.TabStop = False
+        GroupBox2.Text = "自動観測スケジュール"
+        ' 
+        ' Label15
+        ' 
+        Label15.AutoSize = True
+        Label15.Font = New Font("Yu Gothic UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(128))
+        Label15.Location = New Point(205, 53)
+        Label15.Name = "Label15"
+        Label15.Size = New Size(31, 25)
+        Label15.TabIndex = 4
+        Label15.Text = "～"
+        ' 
+        ' DtpEnd
+        ' 
+        DtpEnd.CustomFormat = "HH:mm"
+        DtpEnd.Font = New Font("Yu Gothic UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(128))
+        DtpEnd.Format = DateTimePickerFormat.Custom
+        DtpEnd.Location = New Point(242, 47)
+        DtpEnd.Name = "DtpEnd"
+        DtpEnd.ShowUpDown = True
+        DtpEnd.Size = New Size(80, 33)
+        DtpEnd.TabIndex = 3
+        DtpEnd.Value = New Date(2026, 6, 11, 4, 30, 0, 0)
+        ' 
+        ' DtpStart
+        ' 
+        DtpStart.CustomFormat = "HH:mm"
+        DtpStart.Font = New Font("Yu Gothic UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(128))
+        DtpStart.Format = DateTimePickerFormat.Custom
+        DtpStart.Location = New Point(119, 47)
+        DtpStart.Name = "DtpStart"
+        DtpStart.ShowUpDown = True
+        DtpStart.Size = New Size(80, 33)
+        DtpStart.TabIndex = 2
+        DtpStart.Value = New Date(2026, 6, 11, 21, 0, 0, 0)
+        ' 
+        ' Label14
+        ' 
+        Label14.AutoSize = True
+        Label14.Font = New Font("Yu Gothic UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(128))
+        Label14.Location = New Point(6, 44)
+        Label14.Name = "Label14"
+        Label14.Size = New Size(107, 25)
+        Label14.TabIndex = 1
+        Label14.Text = "観測時間："
+        ' 
+        ' ChkEnableSchedule
+        ' 
+        ChkEnableSchedule.AutoSize = True
+        ChkEnableSchedule.Checked = True
+        ChkEnableSchedule.CheckState = CheckState.Checked
+        ChkEnableSchedule.Location = New Point(6, 22)
+        ChkEnableSchedule.Name = "ChkEnableSchedule"
+        ChkEnableSchedule.Size = New Size(165, 19)
+        ChkEnableSchedule.TabIndex = 0
+        ChkEnableSchedule.Text = "スケジュール機能を有効にする"
+        ChkEnableSchedule.UseVisualStyleBackColor = True
+        ' 
         ' BtnCancel
         ' 
         BtnCancel.Location = New Point(376, 444)
@@ -544,76 +614,6 @@ Partial Class FrmSettings
         BtnOK.TabIndex = 10
         BtnOK.Text = "OK"
         BtnOK.UseVisualStyleBackColor = True
-        ' 
-        ' GroupBox2
-        ' 
-        GroupBox2.Controls.Add(Label15)
-        GroupBox2.Controls.Add(DtpEnd)
-        GroupBox2.Controls.Add(DtpStart)
-        GroupBox2.Controls.Add(Label14)
-        GroupBox2.Controls.Add(ChkEnableSchedule)
-        GroupBox2.Location = New Point(8, 6)
-        GroupBox2.Name = "GroupBox2"
-        GroupBox2.Size = New Size(334, 92)
-        GroupBox2.TabIndex = 0
-        GroupBox2.TabStop = False
-        GroupBox2.Text = "自動観測スケジュール"
-        ' 
-        ' ChkEnableSchedule
-        ' 
-        ChkEnableSchedule.AutoSize = True
-        ChkEnableSchedule.Checked = True
-        ChkEnableSchedule.CheckState = CheckState.Checked
-        ChkEnableSchedule.Location = New Point(6, 22)
-        ChkEnableSchedule.Name = "ChkEnableSchedule"
-        ChkEnableSchedule.Size = New Size(165, 19)
-        ChkEnableSchedule.TabIndex = 0
-        ChkEnableSchedule.Text = "スケジュール機能を有効にする"
-        ChkEnableSchedule.UseVisualStyleBackColor = True
-        ' 
-        ' Label14
-        ' 
-        Label14.AutoSize = True
-        Label14.Font = New Font("Yu Gothic UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(128))
-        Label14.Location = New Point(6, 44)
-        Label14.Name = "Label14"
-        Label14.Size = New Size(107, 25)
-        Label14.TabIndex = 1
-        Label14.Text = "観測時間："
-        ' 
-        ' DtpStart
-        ' 
-        DtpStart.CustomFormat = "HH:mm"
-        DtpStart.Font = New Font("Yu Gothic UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(128))
-        DtpStart.Format = DateTimePickerFormat.Custom
-        DtpStart.Location = New Point(119, 47)
-        DtpStart.Name = "DtpStart"
-        DtpStart.ShowUpDown = True
-        DtpStart.Size = New Size(80, 33)
-        DtpStart.TabIndex = 2
-        DtpStart.Value = New Date(2026, 6, 11, 21, 0, 0, 0)
-        ' 
-        ' DtpEnd
-        ' 
-        DtpEnd.CustomFormat = "HH:mm"
-        DtpEnd.Font = New Font("Yu Gothic UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(128))
-        DtpEnd.Format = DateTimePickerFormat.Custom
-        DtpEnd.Location = New Point(242, 47)
-        DtpEnd.Name = "DtpEnd"
-        DtpEnd.ShowUpDown = True
-        DtpEnd.Size = New Size(80, 33)
-        DtpEnd.TabIndex = 3
-        DtpEnd.Value = New Date(2026, 6, 11, 4, 30, 0, 0)
-        ' 
-        ' Label15
-        ' 
-        Label15.AutoSize = True
-        Label15.Font = New Font("Yu Gothic UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(128))
-        Label15.Location = New Point(205, 53)
-        Label15.Name = "Label15"
-        Label15.Size = New Size(31, 25)
-        Label15.TabIndex = 4
-        Label15.Text = "～"
         ' 
         ' FrmSettings
         ' 

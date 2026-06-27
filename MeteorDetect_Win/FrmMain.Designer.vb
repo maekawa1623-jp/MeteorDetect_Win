@@ -35,6 +35,7 @@ Partial Class FrmMain
         BtnRefreshUsb = New Button()
         CmbUsbDeviceList = New ComboBox()
         PnlSettingsBase = New Panel()
+        Button1 = New Button()
         PnlVideoSettings = New Panel()
         TxtFileName = New TextBox()
         BtnOpenFile = New Button()
@@ -93,6 +94,7 @@ Partial Class FrmMain
         TmrScheduler = New Timer(components)
         CType(PicMain, ComponentModel.ISupportInitialize).BeginInit()
         GrpSource.SuspendLayout()
+        PnlSettingsBase.SuspendLayout()
         PnlVideoSettings.SuspendLayout()
         PnlZwoSettings.SuspendLayout()
         GrpWB.SuspendLayout()
@@ -230,11 +232,21 @@ Partial Class FrmMain
         ' PnlSettingsBase
         ' 
         PnlSettingsBase.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        PnlSettingsBase.Controls.Add(Button1)
         PnlSettingsBase.Location = New Point(975, 131)
         PnlSettingsBase.Margin = New Padding(2)
         PnlSettingsBase.Name = "PnlSettingsBase"
         PnlSettingsBase.Size = New Size(278, 400)
         PnlSettingsBase.TabIndex = 5
+        ' 
+        ' Button1
+        ' 
+        Button1.Location = New Point(56, 399)
+        Button1.Name = "Button1"
+        Button1.Size = New Size(75, 23)
+        Button1.TabIndex = 0
+        Button1.Text = "Button1"
+        Button1.UseVisualStyleBackColor = True
         ' 
         ' PnlVideoSettings
         ' 
@@ -846,6 +858,7 @@ Partial Class FrmMain
         CType(PicMain, ComponentModel.ISupportInitialize).EndInit()
         GrpSource.ResumeLayout(False)
         GrpSource.PerformLayout()
+        PnlSettingsBase.ResumeLayout(False)
         PnlVideoSettings.ResumeLayout(False)
         PnlVideoSettings.PerformLayout()
         PnlZwoSettings.ResumeLayout(False)
@@ -940,4 +953,5 @@ Partial Class FrmMain
     Friend WithEvents CmbRoiSelect As ComboBox
     Friend WithEvents Label2 As Label
     Friend WithEvents TmrScheduler As Timer
+    Friend WithEvents Button1 As Button
 End Class
